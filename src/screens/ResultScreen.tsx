@@ -6,13 +6,14 @@ import { Alert, PermissionsAndroid, Platform, Pressable, Text, View } from 'reac
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Video from 'react-native-video';
 import BigButton from '../components/BigButton';
+import Card from '../components/Card';
+import IconButton from '../components/IconButton';
 import ScreenHeader from '../components/ScreenHeader';
-import Sticker from '../components/Sticker';
 import { DownloadIcon, MuteIcon, PlayIcon, ShareIcon, VolumeIcon } from '../components/icons';
 import { Creation, getCreation } from '../lib/creations';
 import { hapticLight } from '../lib/haptics';
 import { shareCreationVideo } from '../lib/share';
-import { colors, fonts } from '../theme';
+import { colors, fonts, radii, shadows } from '../theme';
 import { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
@@ -47,7 +48,7 @@ export default function ResultScreen({ navigation, route }: Props) {
     setSaving(true);
     try {
       await CameraRoll.save(`file://${creation.videoPath}`, { type: 'video', album: 'SongShot' });
-      Alert.alert('Saved!', 'Your SongShot is in the gallery, ready to post anywhere.');
+      Alert.alert('Saved', 'Your SongShot is in the gallery, ready to post anywhere.');
     } catch {
       Alert.alert("Couldn't save", 'Something blocked the save. Try the Share button instead.');
     } finally {
@@ -63,13 +64,13 @@ export default function ResultScreen({ navigation, route }: Props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.sky, paddingTop: insets.top }}>
-      <ScreenHeader title="Voilà!" onBack={() => navigation.navigate('Home')} />
+      <ScreenHeader title="Ready to share" onBack={() => navigation.navigate('Home')} />
 
-      <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 10, gap: 20 }}>
+      <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24, gap: 20 }}>
         {creation && (
           <>
             <Pressable onPress={() => setPlaying((p) => !p)}>
-              <Sticker bg={colors.ink} radius={24} offset={5}>
+              <Card bg={colors.ink}>
                 <View style={{ aspectRatio: 1, backgroundColor: colors.ink }}>
                   <Video
                     source={{ uri: `file://${creation.videoPath}` }}
@@ -83,65 +84,54 @@ export default function ResultScreen({ navigation, route }: Props) {
                   {!playing && (
                     <View style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center' }}>
                       <View
-                        style={{
-                          width: 58,
-                          height: 58,
-                          borderRadius: 999,
-                          borderWidth: 2.5,
-                          borderColor: colors.ink,
-                          backgroundColor: 'rgba(255,255,255,0.92)',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          paddingLeft: 4,
-                        }}
+                        style={[
+                          {
+                            width: 56,
+                            height: 56,
+                            borderRadius: radii.pill,
+                            backgroundColor: 'rgba(255,255,255,0.92)',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            paddingLeft: 4,
+                          },
+                          shadows.control,
+                        ]}
                       >
-                        <PlayIcon size={26} />
+                        <PlayIcon size={24} />
                       </View>
                     </View>
                   )}
-                  <Pressable
-                    onPress={() => {
-                      hapticLight();
-                      setMuted((m) => !m);
-                    }}
-                    hitSlop={8}
-                    style={{
-                      position: 'absolute',
-                      top: 10,
-                      right: 10,
-                      width: 40,
-                      height: 40,
-                      borderRadius: 14,
-                      borderWidth: 2,
-                      borderColor: colors.ink,
-                      backgroundColor: 'rgba(255,255,255,0.92)',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
+                  <IconButton
+                    onPress={() => setMuted((m) => !m)}
+                    bg="rgba(255,255,255,0.92)"
+                    style={{ position: 'absolute', top: 12, right: 12 }}
                   >
-                    {muted ? <MuteIcon size={20} /> : <VolumeIcon size={20} />}
-                  </Pressable>
+                    {muted ? <MuteIcon size={19} /> : <VolumeIcon size={19} />}
+                  </IconButton>
                 </View>
-              </Sticker>
+              </Card>
             </Pressable>
 
-            <Text style={{ fontFamily: fonts.bodyReg, fontSize: 15, color: colors.smoke, textAlign: 'center' }}>
-              <Text style={{ fontFamily: fonts.body, color: colors.ink }}>{creation.songName}</Text>
-              {'\n'}
-              {creation.durSec.toFixed(0)} seconds of pure vibe — saved to your feed.
-            </Text>
+            <View style={{ alignItems: 'center', gap: 2 }}>
+              <Text style={{ fontFamily: fonts.label, fontSize: 15, color: colors.ink }} numberOfLines={1}>
+                {creation.songName}
+              </Text>
+              <Text style={{ fontFamily: fonts.body, fontSize: 13, color: colors.smoke }}>
+                {creation.durSec.toFixed(0)}s · saved to your feed
+              </Text>
+            </View>
 
             <View style={{ gap: 12 }}>
               <BigButton
                 label={saving ? 'Saving…' : 'Save to gallery'}
-                icon={<DownloadIcon size={22} color={colors.sky} />}
+                icon={<DownloadIcon size={20} color={colors.sky} />}
                 onPress={saveToGallery}
                 disabled={saving}
               />
               <BigButton
                 label="Share it"
                 variant="ghost"
-                icon={<ShareIcon size={22} color={colors.ink} />}
+                icon={<ShareIcon size={20} color={colors.ink} />}
                 onPress={share}
               />
             </View>
@@ -151,7 +141,7 @@ export default function ResultScreen({ navigation, route }: Props) {
 
       <View style={{ paddingHorizontal: 24, paddingBottom: insets.bottom + 16 }}>
         <Pressable onPress={() => navigation.navigate('Home')}>
-          <Text style={{ fontFamily: fonts.body, fontSize: 15, color: colors.smoke, textAlign: 'center' }}>
+          <Text style={{ fontFamily: fonts.label, fontSize: 15, color: colors.smoke, textAlign: 'center' }}>
             Back to my feed
           </Text>
         </Pressable>

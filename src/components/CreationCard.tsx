@@ -3,10 +3,10 @@ import { Alert, Image, Pressable, Text, View } from 'react-native';
 import { hapticHeavy, hapticLight } from '../lib/haptics';
 import { Creation } from '../lib/creations';
 import { shareCreationVideo } from '../lib/share';
-import { colors, fonts } from '../theme';
-import Sticker from './Sticker';
+import { colors, fonts, inkAlpha } from '../theme';
+import Card from './Card';
 import { formatTime } from './WaveTrimmer';
-import { NoteIcon, PlayIcon, ShareIcon, TrashIcon } from './icons';
+import { PlayIcon, ShareIcon, TrashIcon } from './icons';
 
 function timeAgo(ts: number): string {
   const s = Math.floor((Date.now() - ts) / 1000);
@@ -40,7 +40,7 @@ export default function CreationCard({ creation, onOpen, onDelete }: Props) {
   };
 
   return (
-    <Sticker bg={colors.white} radius={20} offset={4} style={{ marginBottom: 18 }}>
+    <Card style={{ marginBottom: 20 }}>
       <Pressable onPress={onOpen}>
         <View style={{ aspectRatio: 4 / 3, backgroundColor: colors.mist }}>
           <Image
@@ -51,46 +51,43 @@ export default function CreationCard({ creation, onOpen, onDelete }: Props) {
           <View
             style={{
               position: 'absolute',
-              right: 10,
-              bottom: 10,
+              right: 12,
+              bottom: 12,
               flexDirection: 'row',
               alignItems: 'center',
               gap: 6,
-              backgroundColor: colors.ink,
+              backgroundColor: inkAlpha(0.82),
               borderRadius: 999,
-              paddingHorizontal: 10,
+              paddingHorizontal: 11,
               paddingVertical: 5,
             }}
           >
-            <PlayIcon size={13} color={colors.sky} />
-            <Text style={{ fontFamily: fonts.body, fontSize: 12, color: colors.sky }}>
+            <PlayIcon size={12} color={colors.white} />
+            <Text style={{ fontFamily: fonts.label, fontSize: 12, color: colors.white }}>
               {creation.durSec.toFixed(0)}s
             </Text>
           </View>
         </View>
       </Pressable>
 
-      <View style={{ padding: 14, gap: 10 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <NoteIcon size={18} />
-          <Text style={{ flex: 1, fontFamily: fonts.body, fontSize: 15, color: colors.ink }} numberOfLines={1}>
+      <View style={{ paddingHorizontal: 16, paddingVertical: 14, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flex: 1, gap: 2, paddingRight: 12 }}>
+          <Text style={{ fontFamily: fonts.label, fontSize: 15, color: colors.ink }} numberOfLines={1}>
             {creation.songName}
           </Text>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ flex: 1, fontFamily: fonts.bodyReg, fontSize: 13, color: colors.smoke }}>
+          <Text style={{ fontFamily: fonts.body, fontSize: 13, color: colors.smoke }}>
             {formatTime(creation.startSec)} – {formatTime(creation.startSec + creation.durSec)} · {timeAgo(creation.createdAt)}
           </Text>
-          <View style={{ flexDirection: 'row', gap: 18, alignItems: 'center' }}>
-            <Pressable onPress={share} hitSlop={10}>
-              <ShareIcon size={20} color={colors.smoke} />
-            </Pressable>
-            <Pressable onPress={confirmDelete} hitSlop={10}>
-              <TrashIcon size={20} color={colors.smoke} />
-            </Pressable>
-          </View>
+        </View>
+        <View style={{ flexDirection: 'row', gap: 20, alignItems: 'center' }}>
+          <Pressable onPress={share} hitSlop={10}>
+            <ShareIcon size={20} color={colors.smoke} />
+          </Pressable>
+          <Pressable onPress={confirmDelete} hitSlop={10}>
+            <TrashIcon size={20} color={colors.smoke} />
+          </Pressable>
         </View>
       </View>
-    </Sticker>
+    </Card>
   );
 }

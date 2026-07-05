@@ -1,14 +1,15 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Image, Modal, PanResponder, Pressable, Text, TextInput, View } from 'react-native';
-import { colors, fonts } from '../theme';
-import Sticker from './Sticker';
+import { colors, fonts, inkAlpha, radii, shadows, skyAlpha } from '../theme';
+import Card from './Card';
 
 export const MIN_CLIP_SEC = 3;
 
 const TRACK_HEIGHT = 104;
-const HANDLE_WIDTH = 26;
 // Touches this close to a selection edge grab that handle instead of sliding.
 const EDGE_GRAB_PX = 26;
+// Visible grip drawn at each selection edge (the grab zone stays EDGE_GRAB_PX wide).
+const GRIP_WIDTH = 14;
 
 export function formatTime(sec: number): string {
   const s = Math.max(0, Math.floor(sec));
@@ -159,7 +160,7 @@ export default function WaveTrimmer({
     <Pressable onPress={() => beginEdit(edge)} hitSlop={10}>
       <Text
         style={{
-          fontFamily: fonts.body,
+          fontFamily: fonts.label,
           fontSize: 13,
           color: colors.smoke,
           borderBottomWidth: 1,
@@ -182,14 +183,15 @@ export default function WaveTrimmer({
       <View
         {...pan.panHandlers}
         onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
-        style={{
-          height: TRACK_HEIGHT,
-          backgroundColor: colors.white,
-          borderWidth: 2.5,
-          borderColor: colors.ink,
-          borderRadius: 16,
-          overflow: 'hidden',
-        }}
+        style={[
+          {
+            height: TRACK_HEIGHT,
+            backgroundColor: colors.white,
+            borderRadius: radii.control,
+            overflow: 'hidden',
+          },
+          shadows.control,
+        ]}
       >
         {waveformUri ? (
           <View pointerEvents="none" style={{ position: 'absolute', top: 6, bottom: 6, left: 0, right: 0 }}>
@@ -227,14 +229,14 @@ export default function WaveTrimmer({
           </View>
         )}
 
-        {/* Dim everything outside the selection */}
+        {/* Fade everything outside the selection into the sky */}
         <View
           pointerEvents="none"
-          style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: x1, backgroundColor: 'rgba(255,255,255,0.72)' }}
+          style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: x1, backgroundColor: skyAlpha(0.75) }}
         />
         <View
           pointerEvents="none"
-          style={{ position: 'absolute', top: 0, bottom: 0, left: x2, right: 0, backgroundColor: 'rgba(255,255,255,0.72)' }}
+          style={{ position: 'absolute', top: 0, bottom: 0, left: x2, right: 0, backgroundColor: skyAlpha(0.75) }}
         />
 
         {/* Selection frame */}
@@ -246,10 +248,9 @@ export default function WaveTrimmer({
             bottom: 0,
             left: x1,
             width: Math.max(0, x2 - x1),
-            borderWidth: 3,
+            borderWidth: 2,
             borderColor: colors.ink,
-            borderRadius: 12,
-            backgroundColor: 'rgba(201,227,245,0.25)',
+            borderRadius: 10,
           }}
         />
 
@@ -261,54 +262,54 @@ export default function WaveTrimmer({
               position: 'absolute',
               top: 4,
               bottom: 4,
-              left: clamp(playheadSec * pps, 0, Math.max(0, width - 3)),
-              width: 3,
-              borderRadius: 2,
+              left: clamp(playheadSec * pps, 0, Math.max(0, width - 2)),
+              width: 2,
+              borderRadius: 1,
               backgroundColor: colors.smoke,
             }}
           />
         )}
 
-        {/* Handles */}
+        {/* Edge grips — white so they read over the ink waveform */}
         {(['left', 'right'] as const).map((edge) => {
-          const x = edge === 'left' ? x1 - HANDLE_WIDTH / 2 : x2 - HANDLE_WIDTH / 2;
+          const x = edge === 'left' ? x1 - GRIP_WIDTH / 2 : x2 - GRIP_WIDTH / 2;
           return (
             <View
               key={edge}
               pointerEvents="none"
-              style={{
-                position: 'absolute',
-                top: 8,
-                bottom: 8,
-                left: clamp(x, -HANDLE_WIDTH / 2, Math.max(0, width - HANDLE_WIDTH / 2)),
-                width: HANDLE_WIDTH,
-                borderRadius: 10,
-                backgroundColor: colors.ink,
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 4,
-              }}
+              style={[
+                {
+                  position: 'absolute',
+                  top: 26,
+                  bottom: 26,
+                  left: clamp(x, -GRIP_WIDTH / 2, Math.max(0, width - GRIP_WIDTH / 2)),
+                  width: GRIP_WIDTH,
+                  borderRadius: GRIP_WIDTH / 2,
+                  backgroundColor: colors.white,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                },
+                shadows.control,
+              ]}
             >
-              {[0, 1, 2].map((i) => (
-                <View key={i} style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: colors.sky }} />
-              ))}
+              <View style={{ width: 2.5, height: 18, borderRadius: 1.5, backgroundColor: colors.ink }} />
             </View>
           );
         })}
       </View>
 
       {/* Time labels — tap one to type an exact time */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
         {timeField('start')}
         <View
           style={{
-            backgroundColor: colors.ink,
-            borderRadius: 999,
+            backgroundColor: colors.mist,
+            borderRadius: radii.pill,
             paddingHorizontal: 12,
             paddingVertical: 4,
           }}
         >
-          <Text style={{ fontFamily: fonts.body, fontSize: 13, color: colors.sky }}>
+          <Text style={{ fontFamily: fonts.label, fontSize: 13, color: colors.ink }}>
             {formatClipLength(end - start)} selected
           </Text>
         </View>
@@ -318,12 +319,12 @@ export default function WaveTrimmer({
       {/* Type-a-time modal — sits high so the keyboard never covers it */}
       <Modal visible={editing !== null} transparent animationType="fade" onRequestClose={() => setEditing(null)}>
         <Pressable
-          style={{ flex: 1, backgroundColor: 'rgba(21,23,26,0.45)', alignItems: 'center', paddingTop: 110 }}
+          style={{ flex: 1, backgroundColor: inkAlpha(0.4), alignItems: 'center', paddingTop: 110 }}
           onPress={() => setEditing(null)}
         >
           <Pressable onPress={() => {}}>
-            <Sticker bg={colors.white} radius={24} offset={5}>
-              <View style={{ padding: 22, width: 260, alignItems: 'center', gap: 14 }}>
+            <Card>
+              <View style={{ padding: 24, width: 260, alignItems: 'center', gap: 14 }}>
                 <Text style={{ fontFamily: fonts.display, fontSize: 20, color: colors.ink }}>
                   {editing === 'end' ? 'End at' : 'Start at'}
                 </Text>
@@ -341,11 +342,11 @@ export default function WaveTrimmer({
                     textAlign: 'center',
                     minWidth: 130,
                     paddingVertical: 4,
-                    borderBottomWidth: 2.5,
+                    borderBottomWidth: 2,
                     borderColor: colors.ink,
                   }}
                 />
-                <Text style={{ fontFamily: fonts.bodyReg, fontSize: 13, color: colors.smoke }}>
+                <Text style={{ fontFamily: fonts.body, fontSize: 13, color: colors.smoke }}>
                   between {formatTime(editMin)} and {formatTime(editMax)}
                 </Text>
                 <Pressable
@@ -353,16 +354,16 @@ export default function WaveTrimmer({
                   style={({ pressed }) => ({
                     alignSelf: 'stretch',
                     backgroundColor: colors.ink,
-                    borderRadius: 999,
+                    borderRadius: radii.pill,
                     paddingVertical: 12,
                     alignItems: 'center',
                     opacity: pressed ? 0.85 : 1,
                   })}
                 >
-                  <Text style={{ fontFamily: fonts.body, fontSize: 15, color: colors.sky }}>Done</Text>
+                  <Text style={{ fontFamily: fonts.label, fontSize: 15, color: colors.sky }}>Done</Text>
                 </Pressable>
               </View>
-            </Sticker>
+            </Card>
           </Pressable>
         </Pressable>
       </Modal>

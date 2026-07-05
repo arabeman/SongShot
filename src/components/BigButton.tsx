@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Pressable, Text, View, ViewStyle } from 'react-native';
 import { hapticLight } from '../lib/haptics';
-import { colors, fonts } from '../theme';
-import Sticker from './Sticker';
+import { colors, fonts, radii, shadows } from '../theme';
 
 interface Props {
   label: string;
@@ -14,9 +13,7 @@ interface Props {
 }
 
 export default function BigButton({ label, onPress, icon, variant = 'primary', disabled = false, style }: Props) {
-  const [pressed, setPressed] = useState(false);
-  const bg = variant === 'primary' ? colors.ink : colors.white;
-  const fg = variant === 'primary' ? colors.sky : colors.ink;
+  const primary = variant === 'primary';
 
   return (
     <Pressable
@@ -24,26 +21,32 @@ export default function BigButton({ label, onPress, icon, variant = 'primary', d
         hapticLight();
         onPress();
       }}
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
       disabled={disabled}
-      style={[{ opacity: disabled ? 0.4 : 1 }, style]}
+      style={({ pressed }) => [
+        { opacity: disabled ? 0.45 : pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] },
+        style,
+      ]}
     >
-      <Sticker bg={bg} radius={22} offset={4} pressed={pressed}>
-        <View
-          style={{
+      <View
+        style={[
+          {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 10,
             paddingVertical: 16,
-            paddingHorizontal: 24,
-          }}
-        >
-          {icon}
-          <Text style={{ fontFamily: fonts.body, fontSize: 17, color: fg }}>{label}</Text>
-        </View>
-      </Sticker>
+            paddingHorizontal: 28,
+            borderRadius: radii.pill,
+            backgroundColor: primary ? colors.ink : colors.white,
+          },
+          primary ? shadows.control : { borderWidth: 1, borderColor: colors.mist },
+        ]}
+      >
+        {icon}
+        <Text style={{ fontFamily: fonts.label, fontSize: 16, color: primary ? colors.sky : colors.ink }}>
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 }

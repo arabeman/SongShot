@@ -1,54 +1,35 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
-import { hapticSelection } from '../lib/haptics';
+import { Text, View } from 'react-native';
 import { colors, fonts } from '../theme';
 import { BackIcon } from './icons';
+import IconButton from './IconButton';
 
 interface Props {
   title: string;
+  subtitle?: string;
   onBack?: () => void;
   right?: React.ReactNode;
 }
 
-export default function ScreenHeader({ title, onBack, right }: Props) {
+/**
+ * Nav row on top, then a left-aligned display title.
+ * `right` sits opposite the back button (step meter, actions).
+ */
+export default function ScreenHeader({ title, subtitle, onBack, right }: Props) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, height: 56 }}>
-      <View style={{ width: 44 }}>
-        {onBack && (
-          <Pressable
-            onPress={() => {
-              hapticSelection();
-              onBack();
-            }}
-            hitSlop={8}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 14,
-              borderWidth: 2,
-              borderColor: colors.ink,
-              backgroundColor: colors.white,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
+    <View style={{ paddingHorizontal: 24 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
+        <View>{onBack && (
+          <IconButton onPress={onBack}>
             <BackIcon size={20} />
-          </Pressable>
-        )}
+          </IconButton>
+        )}</View>
+        <View>{right}</View>
       </View>
-      <Text
-        style={{
-          flex: 1,
-          textAlign: 'center',
-          fontFamily: fonts.display,
-          fontSize: 22,
-          color: colors.ink,
-        }}
-        numberOfLines={1}
-      >
-        {title}
-      </Text>
-      <View style={{ width: 44, alignItems: 'flex-end' }}>{right}</View>
+      <Text style={{ fontFamily: fonts.display, fontSize: 27, color: colors.ink, paddingTop: 4 }}>{title}</Text>
+      {subtitle && (
+        <Text style={{ fontFamily: fonts.body, fontSize: 14, color: colors.smoke, paddingTop: 4 }}>{subtitle}</Text>
+      )}
     </View>
   );
 }

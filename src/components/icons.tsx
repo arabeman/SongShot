@@ -8,7 +8,7 @@ export interface IconProps {
 }
 
 const stroke = {
-  strokeWidth: 2.4,
+  strokeWidth: 1.9,
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
   fill: 'none',
@@ -85,7 +85,7 @@ export function PlayIcon({ size = 24, color = colors.ink }: IconProps) {
 export function PauseIcon({ size = 24, color = colors.ink }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
-      <Path d="M8 5.5v13M16 5.5v13" stroke={color} {...stroke} strokeWidth={3.6} />
+      <Path d="M8 5.5v13M16 5.5v13" stroke={color} {...stroke} strokeWidth={2.8} />
     </Svg>
   );
 }

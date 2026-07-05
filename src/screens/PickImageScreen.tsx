@@ -4,11 +4,11 @@ import { Alert, Image, Text, View } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BigButton from '../components/BigButton';
+import Card from '../components/Card';
 import ScreenHeader from '../components/ScreenHeader';
-import StepPips from '../components/StepPips';
-import Sticker from '../components/Sticker';
+import StepMeter from '../components/StepMeter';
 import { PhotoIcon } from '../components/icons';
-import { colors, fonts } from '../theme';
+import { colors, fonts, radii } from '../theme';
 import { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PickImage'>;
@@ -30,39 +30,48 @@ export default function PickImageScreen({ navigation }: Props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.sky, paddingTop: insets.top }}>
-      <ScreenHeader title="Pick a photo" onBack={() => navigation.goBack()} />
-      <View style={{ paddingTop: 6, paddingBottom: 18 }}>
-        <StepPips current={1} />
-      </View>
+      <ScreenHeader
+        title="Pick a photo"
+        subtitle="Your video is built around one picture."
+        onBack={() => navigation.goBack()}
+        right={<StepMeter current={1} />}
+      />
 
-      <View style={{ flex: 1, paddingHorizontal: 24, gap: 20 }}>
+      <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24, gap: 20 }}>
         {imageUri ? (
-          <Sticker bg={colors.white} radius={24} offset={5}>
+          <Card>
             <Image source={{ uri: imageUri }} style={{ width: '100%', aspectRatio: 1 }} resizeMode="cover" />
-          </Sticker>
+          </Card>
         ) : (
-          <Sticker bg={colors.white} radius={24} offset={5}>
-            <View style={{ aspectRatio: 1, alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24 }}>
-              <PhotoIcon size={54} color={colors.steel} />
-              <Text
-                style={{ fontFamily: fonts.bodyReg, fontSize: 15, color: colors.smoke, textAlign: 'center' }}
-              >
-                This picture becomes the star of your video.
-              </Text>
-            </View>
-          </Sticker>
+          // An empty slot, not yet a surface — it fills in once a photo is chosen.
+          <View
+            style={{
+              aspectRatio: 1,
+              borderRadius: radii.card,
+              backgroundColor: 'rgba(255,255,255,0.5)',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 12,
+              padding: 24,
+            }}
+          >
+            <PhotoIcon size={46} color={colors.steel} />
+            <Text style={{ fontFamily: fonts.body, fontSize: 14, color: colors.smoke, textAlign: 'center' }}>
+              The photo you choose shows up here.
+            </Text>
+          </View>
         )}
 
         <View style={{ gap: 12 }}>
           <BigButton
             label={imageUri ? 'Swap photo' : 'Choose from gallery'}
             variant={imageUri ? 'ghost' : 'primary'}
-            icon={<PhotoIcon size={22} color={imageUri ? colors.ink : colors.sky} />}
+            icon={<PhotoIcon size={20} color={imageUri ? colors.ink : colors.sky} />}
             onPress={pick}
           />
           {imageUri && (
             <BigButton
-              label="Next: pick a song"
+              label="Next: pick the song"
               onPress={() => navigation.navigate('PickSong', { imageUri })}
             />
           )}

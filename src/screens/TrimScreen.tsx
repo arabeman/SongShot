@@ -6,15 +6,15 @@ import { Alert, Image, Pressable, Text, View } from 'react-native';
 import Video, { VideoRef } from 'react-native-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BigButton from '../components/BigButton';
+import Card from '../components/Card';
 import ScreenHeader from '../components/ScreenHeader';
-import StepPips from '../components/StepPips';
-import Sticker from '../components/Sticker';
+import StepMeter from '../components/StepMeter';
 import WaveTrimmer from '../components/WaveTrimmer';
 import { PauseIcon, PlayIcon, SparkleIcon } from '../components/icons';
 import { addCreation, creationsDir, ensureCreationsDir, newCreationId } from '../lib/creations';
 import { hapticHeavy } from '../lib/haptics';
 import { exportCreationVideo, renderWaveformPng, uriToPath } from '../lib/media';
-import { colors, fonts } from '../theme';
+import { colors, fonts, radii, shadows, skyAlpha } from '../theme';
 import { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Trim'>;
@@ -24,6 +24,31 @@ const DEFAULT_CLIP_SEC = 15;
 function imageExtension(uri: string): string {
   const match = uri.match(/\.(jpe?g|png|webp|gif|heic)$/i);
   return match ? match[1].toLowerCase() : 'jpg';
+}
+
+// A fixed wave silhouette that fills with ink as the export progresses.
+const PROGRESS_BARS = [
+  0.35, 0.55, 0.8, 0.6, 0.95, 0.7, 0.45, 0.85, 0.65, 1, 0.5, 0.75, 0.9, 0.4, 0.7, 0.55, 0.85, 0.6, 0.95, 0.45,
+  0.75, 0.5, 0.65, 0.35,
+];
+
+function WaveProgress({ progress }: { progress: number }) {
+  const filled = Math.round(progress * PROGRESS_BARS.length);
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, height: 52 }}>
+      {PROGRESS_BARS.map((h, i) => (
+        <View
+          key={i}
+          style={{
+            width: 5,
+            height: 52 * h,
+            borderRadius: 2.5,
+            backgroundColor: i < filled ? colors.ink : colors.mist,
+          }}
+        />
+      ))}
+    </View>
+  );
 }
 
 export default function TrimScreen({ navigation, route }: Props) {
@@ -138,10 +163,12 @@ export default function TrimScreen({ navigation, route }: Props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.sky, paddingTop: insets.top }}>
-      <ScreenHeader title="Choose the moment" onBack={() => navigation.goBack()} />
-      <View style={{ paddingTop: 6, paddingBottom: 14 }}>
-        <StepPips current={3} />
-      </View>
+      <ScreenHeader
+        title="Choose the moment"
+        subtitle="Drag the edges to trim · drag the middle to move"
+        onBack={() => navigation.goBack()}
+        right={<StepMeter current={3} />}
+      />
 
       {/* Hidden preview player for the song */}
       <Video
@@ -160,13 +187,13 @@ export default function TrimScreen({ navigation, route }: Props) {
         style={{ width: 0, height: 0 }}
       />
 
-      <View style={{ flex: 1, paddingHorizontal: 24, gap: 22 }}>
+      <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24, gap: 24 }}>
         {/* Tap the photo to preview the selected slice */}
         <View style={{ alignItems: 'center' }}>
           <Pressable onPress={togglePlay} disabled={!ready}>
-            <Sticker bg={colors.white} radius={24} offset={5}>
+            <Card>
               <View>
-                <Image source={{ uri: imageUri }} style={{ width: 230, height: 230 }} resizeMode="cover" />
+                <Image source={{ uri: imageUri }} style={{ width: 216, height: 216 }} resizeMode="cover" />
                 <View
                   style={{
                     position: 'absolute',
@@ -176,97 +203,71 @@ export default function TrimScreen({ navigation, route }: Props) {
                   }}
                 >
                   <View
-                    style={{
-                      width: 58,
-                      height: 58,
-                      borderRadius: 999,
-                      borderWidth: 2.5,
-                      borderColor: colors.ink,
-                      backgroundColor: 'rgba(255,255,255,0.92)',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      paddingLeft: playing ? 0 : 4,
-                    }}
+                    style={[
+                      {
+                        width: 56,
+                        height: 56,
+                        borderRadius: radii.pill,
+                        backgroundColor: 'rgba(255,255,255,0.92)',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        paddingLeft: playing ? 0 : 4,
+                      },
+                      shadows.control,
+                    ]}
                   >
-                    {playing ? <PauseIcon size={26} /> : <PlayIcon size={26} />}
+                    {playing ? <PauseIcon size={24} /> : <PlayIcon size={24} />}
                   </View>
                 </View>
               </View>
-            </Sticker>
+            </Card>
           </Pressable>
         </View>
 
-        <View style={{ gap: 8 }}>
-          <Text style={{ fontFamily: fonts.body, fontSize: 14, color: colors.smoke, textAlign: 'center' }}>
-            Drag the edges to trim · drag the middle to move · tap to jump
+        {ready ? (
+          <WaveTrimmer
+            durationSec={duration}
+            waveformUri={waveformUri ? waveformUri.split('?')[0] : null}
+            songName={songName}
+            start={start}
+            end={end}
+            onWindowChange={onWindowChange}
+            playheadSec={playing ? playhead : null}
+          />
+        ) : (
+          <Text style={{ fontFamily: fonts.body, fontSize: 14, color: colors.steel, textAlign: 'center' }}>
+            Listening to the song…
           </Text>
-          {ready ? (
-            <WaveTrimmer
-              durationSec={duration}
-              waveformUri={waveformUri ? waveformUri.split('?')[0] : null}
-              songName={songName}
-              start={start}
-              end={end}
-              onWindowChange={onWindowChange}
-              playheadSec={playing ? playhead : null}
-            />
-          ) : (
-            <Text style={{ fontFamily: fonts.bodyReg, fontSize: 14, color: colors.steel, textAlign: 'center' }}>
-              Listening to the song…
-            </Text>
-          )}
-        </View>
+        )}
 
         <BigButton
-          label="Voilà — make my SongShot"
-          icon={<SparkleIcon size={22} color={colors.sky} />}
+          label="Make my SongShot"
+          icon={<SparkleIcon size={20} color={colors.sky} />}
           onPress={exportNow}
           disabled={!ready || exporting}
         />
       </View>
 
-      {/* Export overlay */}
+      {/* Export overlay — the wave fills with ink as the mix renders */}
       {exporting && (
         <View
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundColor: 'rgba(201,227,245,0.93)',
+            backgroundColor: skyAlpha(0.96),
             alignItems: 'center',
             justifyContent: 'center',
+            gap: 24,
             paddingHorizontal: 40,
           }}
         >
-          <Sticker bg={colors.white} radius={24} offset={5}>
-            <View style={{ padding: 26, alignItems: 'center', gap: 16, width: 280 }}>
-              <SparkleIcon size={40} />
-              <Text style={{ fontFamily: fonts.display, fontSize: 20, color: colors.ink }}>
-                Mixing your SongShot…
-              </Text>
-              <View
-                style={{
-                  alignSelf: 'stretch',
-                  height: 16,
-                  borderRadius: 999,
-                  borderWidth: 2,
-                  borderColor: colors.ink,
-                  backgroundColor: colors.sky,
-                  overflow: 'hidden',
-                }}
-              >
-                <View
-                  style={{
-                    width: `${Math.round((exportProgress ?? 0) * 100)}%`,
-                    height: '100%',
-                    backgroundColor: colors.ink,
-                  }}
-                />
-              </View>
-              <Text style={{ fontFamily: fonts.body, fontSize: 14, color: colors.smoke }}>
-                {Math.round((exportProgress ?? 0) * 100)}%
-              </Text>
-            </View>
-          </Sticker>
+          <WaveProgress progress={exportProgress ?? 0} />
+          <Text style={{ fontFamily: fonts.display, fontSize: 22, color: colors.ink }}>
+            Mixing your SongShot…
+          </Text>
+          <Text style={{ fontFamily: fonts.label, fontSize: 14, color: colors.smoke }}>
+            {Math.round((exportProgress ?? 0) * 100)}%
+          </Text>
         </View>
       )}
     </View>

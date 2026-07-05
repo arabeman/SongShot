@@ -3,13 +3,15 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useState } from 'react';
 import { Animated, FlatList, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 import CreationCard from '../components/CreationCard';
-import Sticker from '../components/Sticker';
-import { HeartIcon, NoteIcon, PlusIcon } from '../components/icons';
+import IconButton from '../components/IconButton';
+import WaveMark from '../components/WaveMark';
+import { HeartIcon, PlusIcon } from '../components/icons';
 import { Creation, listCreations, removeCreation } from '../lib/creations';
-import { hapticLight, hapticSelection } from '../lib/haptics';
+import { hapticLight } from '../lib/haptics';
 import { useCycleWord } from '../lib/useCycleWord';
-import { colors, fonts } from '../theme';
+import { colors, fonts, radii, shadows } from '../theme';
 import { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -19,23 +21,58 @@ const MOMENT_WORDS = ['chorus', 'beat drop', 'hook', 'guitar solo', 'bridge', 'h
 function EmptyFeed() {
   const { word, opacity } = useCycleWord(MOMENT_WORDS, 2600);
   return (
-    <View style={{ alignItems: 'center', paddingTop: 70, paddingHorizontal: 30 }}>
-      <Sticker bg={colors.white} radius={24} offset={5}>
-        <View style={{ padding: 24, alignItems: 'center', gap: 12, width: 280 }}>
-          <NoteIcon size={44} />
-          <Text style={{ fontFamily: fonts.display, fontSize: 22, color: colors.ink, textAlign: 'center' }}>
-            Every photo has a soundtrack
-          </Text>
-          <Text style={{ fontFamily: fonts.bodyReg, fontSize: 15, color: colors.smoke, textAlign: 'center' }}>
-            Pick a picture, then pair it with the{' '}
-            <Animated.Text style={{ fontFamily: fonts.body, color: colors.ink, opacity }}>{word}</Animated.Text>{' '}
-            it deserves.
-          </Text>
-          <Text style={{ fontFamily: fonts.body, fontSize: 14, color: colors.steel }}>
-            Tap + to make your first SongShot
-          </Text>
-        </View>
-      </Sticker>
+    <View style={{ alignItems: 'center', paddingTop: 96, paddingHorizontal: 40, gap: 16 }}>
+      <WaveMark size={44} color={colors.steel} />
+      <Text
+        style={{ fontFamily: fonts.display, fontSize: 24, color: colors.ink, textAlign: 'center', lineHeight: 31 }}
+      >
+        Every photo has a soundtrack
+      </Text>
+      <Text
+        style={{ fontFamily: fonts.body, fontSize: 15, color: colors.smoke, textAlign: 'center', lineHeight: 22 }}
+      >
+        Pick a picture, then pair it with the{' '}
+        <Animated.Text style={{ fontFamily: fonts.label, color: colors.ink, opacity }}>{word}</Animated.Text>{' '}
+        it deserves.
+      </Text>
+    </View>
+  );
+}
+
+/** A hand-placed note beside the FAB: tilted word, arrow swooping into the button. */
+function FabHint() {
+  return (
+    <View
+      pointerEvents="none"
+      style={{ position: 'absolute', bottom: 44, right: '50%', marginRight: 32, alignItems: 'flex-start' }}
+    >
+      <Text
+        style={{
+          fontFamily: fonts.display,
+          fontSize: 14,
+          color: colors.white,
+          transform: [{ rotate: '-7deg' }],
+        }}
+      >
+        make one
+      </Text>
+      <Svg width={30} height={24} viewBox="0 0 30 24" style={{ marginLeft: 28, marginTop: 2 }}>
+        <Path
+          d="M3 2 C 6 11, 14 18, 25 20"
+          stroke={colors.white}
+          strokeWidth={1.8}
+          strokeLinecap="round"
+          fill="none"
+        />
+        <Path
+          d="M19 21.5 L25.5 20 L21.5 14.5"
+          stroke={colors.white}
+          strokeWidth={1.8}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </Svg>
     </View>
   );
 }
@@ -62,53 +99,23 @@ export default function HomeScreen({ navigation }: Props) {
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          paddingHorizontal: 20,
-          height: 60,
+          paddingHorizontal: 24,
+          height: 64,
         }}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-          <View
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: 12,
-              borderWidth: 2.5,
-              borderColor: colors.ink,
-              backgroundColor: colors.white,
-              alignItems: 'center',
-              justifyContent: 'center',
-              transform: [{ rotate: '-6deg' }],
-            }}
-          >
-            <NoteIcon size={20} />
-          </View>
-          <Text style={{ fontFamily: fonts.display, fontSize: 26, color: colors.ink }}>SongShot</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+          <WaveMark size={24} />
+          <Text style={{ fontFamily: fonts.wordmark, fontSize: 25, color: colors.ink }}>SongShot</Text>
         </View>
-        <Pressable
-          onPress={() => {
-            hapticSelection();
-            navigation.navigate('Support');
-          }}
-          hitSlop={8}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 14,
-            borderWidth: 2,
-            borderColor: colors.ink,
-            backgroundColor: colors.white,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <HeartIcon size={20} />
-        </Pressable>
+        <IconButton onPress={() => navigation.navigate('Support')}>
+          <HeartIcon size={19} />
+        </IconButton>
       </View>
 
       <FlatList
         data={creations}
         keyExtractor={(c) => c.id}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120 }}
+        contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 10, paddingBottom: 130 }}
         ListEmptyComponent={<EmptyFeed />}
         renderItem={({ item }) => (
           <CreationCard
@@ -119,25 +126,44 @@ export default function HomeScreen({ navigation }: Props) {
         )}
       />
 
-      {/* Compose FAB */}
-      <Pressable
-        onPress={() => {
-          hapticLight();
-          navigation.navigate('PickImage');
-        }}
-        style={({ pressed }) => ({
+      {/* Compose FAB — press transform stays on the wrapper, never on the
+          elevated circle itself: elevation + transform on one node renders
+          unreliably on Android. */}
+      <View
+        pointerEvents="box-none"
+        style={{
           position: 'absolute',
-          right: 22,
-          bottom: insets.bottom + 24,
-          transform: [{ scale: pressed ? 0.94 : 1 }],
-        })}
+          left: 0,
+          right: 0,
+          bottom: insets.bottom + 36,
+          alignItems: 'center',
+        }}
       >
-        <Sticker bg={colors.ink} radius={999} offset={4}>
-          <View style={{ width: 62, height: 62, alignItems: 'center', justifyContent: 'center' }}>
-            <PlusIcon size={30} color={colors.sky} />
+        <Pressable
+          onPress={() => {
+            hapticLight();
+            navigation.navigate('PickImage');
+          }}
+          style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.94 : 1 }] })}
+        >
+          <View
+            style={[
+              {
+                width: 60,
+                height: 60,
+                borderRadius: radii.pill,
+                backgroundColor: colors.ink,
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+              shadows.card,
+            ]}
+          >
+            <PlusIcon size={28} color={colors.sky} />
           </View>
-        </Sticker>
-      </Pressable>
+        </Pressable>
+        {creations.length < 2 && <FabHint />}
+      </View>
     </View>
   );
 }

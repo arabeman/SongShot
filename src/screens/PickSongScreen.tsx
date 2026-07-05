@@ -10,13 +10,13 @@ import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Image, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BigButton from '../components/BigButton';
+import Card from '../components/Card';
 import ScreenHeader from '../components/ScreenHeader';
-import StepPips from '../components/StepPips';
-import Sticker from '../components/Sticker';
-import { NoteIcon } from '../components/icons';
+import StepMeter from '../components/StepMeter';
+import WaveMark from '../components/WaveMark';
 import { formatTime } from '../components/WaveTrimmer';
 import { probeDurationSec } from '../lib/media';
-import { colors, fonts } from '../theme';
+import { colors, fonts, radii } from '../theme';
 import { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PickSong'>;
@@ -58,73 +58,79 @@ export default function PickSongScreen({ navigation, route }: Props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.sky, paddingTop: insets.top }}>
-      <ScreenHeader title="Pick a song" onBack={() => navigation.goBack()} />
-      <View style={{ paddingTop: 6, paddingBottom: 18 }}>
-        <StepPips current={2} />
-      </View>
+      <ScreenHeader
+        title="Pick the song"
+        subtitle="Any audio file on your phone works."
+        onBack={() => navigation.goBack()}
+        right={<StepMeter current={2} />}
+      />
 
-      <View style={{ flex: 1, paddingHorizontal: 24, gap: 20 }}>
+      <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24, gap: 20 }}>
         {/* The chosen photo stays visible for context */}
         <View style={{ alignItems: 'center' }}>
-          <Sticker bg={colors.white} radius={20} offset={4} style={{ transform: [{ rotate: '-2deg' }] }}>
-            <Image source={{ uri: imageUri }} style={{ width: 140, height: 140 }} resizeMode="cover" />
-          </Sticker>
+          <Card radius={18}>
+            <Image source={{ uri: imageUri }} style={{ width: 128, height: 128 }} resizeMode="cover" />
+          </Card>
         </View>
 
         {loading ? (
-          <Sticker bg={colors.white} radius={22} offset={4}>
+          <Card>
             <View style={{ padding: 24, alignItems: 'center', gap: 10 }}>
               <ActivityIndicator color={colors.ink} />
-              <Text style={{ fontFamily: fonts.bodyReg, fontSize: 14, color: colors.smoke }}>
+              <Text style={{ fontFamily: fonts.body, fontSize: 14, color: colors.smoke }}>
                 Reading your song…
               </Text>
             </View>
-          </Sticker>
+          </Card>
         ) : song ? (
-          <Sticker bg={colors.white} radius={22} offset={4}>
-            <View style={{ padding: 18, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Card>
+            <View style={{ padding: 18, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
               <View
                 style={{
                   width: 46,
                   height: 46,
-                  borderRadius: 16,
-                  borderWidth: 2.5,
-                  borderColor: colors.ink,
+                  borderRadius: radii.control,
                   backgroundColor: colors.sky,
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <NoteIcon size={24} />
+                <WaveMark size={20} />
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: fonts.body, fontSize: 16, color: colors.ink }} numberOfLines={2}>
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text style={{ fontFamily: fonts.label, fontSize: 16, color: colors.ink }} numberOfLines={2}>
                   {song.name}
                 </Text>
                 {song.duration !== null && (
-                  <Text style={{ fontFamily: fonts.bodyReg, fontSize: 13, color: colors.smoke }}>
+                  <Text style={{ fontFamily: fonts.body, fontSize: 13, color: colors.smoke }}>
                     {formatTime(song.duration)} long
                   </Text>
                 )}
               </View>
             </View>
-          </Sticker>
+          </Card>
         ) : (
-          <Sticker bg={colors.white} radius={22} offset={4}>
-            <View style={{ padding: 24, alignItems: 'center', gap: 12 }}>
-              <NoteIcon size={44} color={colors.steel} />
-              <Text style={{ fontFamily: fonts.bodyReg, fontSize: 15, color: colors.smoke, textAlign: 'center' }}>
-                Pick any audio file on your phone — MP3, M4A, WAV and friends.
-              </Text>
-            </View>
-          </Sticker>
+          // Empty slot, echoing the photo step
+          <View
+            style={{
+              borderRadius: radii.card,
+              backgroundColor: 'rgba(255,255,255,0.5)',
+              alignItems: 'center',
+              gap: 12,
+              padding: 28,
+            }}
+          >
+            <WaveMark size={36} color={colors.steel} />
+            <Text style={{ fontFamily: fonts.body, fontSize: 14, color: colors.smoke, textAlign: 'center' }}>
+              MP3, M4A, WAV — whatever is on this device.
+            </Text>
+          </View>
         )}
 
         <View style={{ gap: 12 }}>
           <BigButton
             label={song ? 'Swap song' : 'Browse my music'}
             variant={song ? 'ghost' : 'primary'}
-            icon={<NoteIcon size={22} color={song ? colors.ink : colors.sky} />}
             onPress={pickSong}
             disabled={loading}
           />
