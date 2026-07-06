@@ -79,7 +79,7 @@ android {
 
     namespace "com.rn"
     defaultConfig {
-        applicationId "com.rn"
+        applicationId "com.songshot.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
