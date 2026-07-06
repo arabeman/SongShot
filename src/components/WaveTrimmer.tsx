@@ -177,82 +177,88 @@ export default function WaveTrimmer({
   const editMin = editing === 'end' ? start + minLen : 0;
   const editMax = editing === 'end' ? durationSec : end - minLen;
 
+  // The full-track waveform, drawn twice: faded across the whole track, and
+  // again in full ink inside the selection card.
+  const wave = waveformUri ? (
+    <View style={{ position: 'absolute', top: 6, bottom: 6, left: 0, right: 0 }}>
+      <Image
+        source={{ uri: `file://${waveformUri}` }}
+        style={{ flex: 1, width: undefined, height: undefined }}
+        resizeMode="stretch"
+      />
+    </View>
+  ) : (
+    <View
+      style={{
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 4,
+        right: 4,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3,
+      }}
+    >
+      {bars.map((b, i) => (
+        <View
+          key={i}
+          style={{
+            flex: 1,
+            height: b * (TRACK_HEIGHT - 34),
+            borderRadius: 3,
+            backgroundColor: colors.ink,
+          }}
+        />
+      ))}
+    </View>
+  );
+
   return (
     <View>
       {/* Track — the only touch target; children are draw-only */}
       <View
         {...pan.panHandlers}
         onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
-        style={[
-          {
-            height: TRACK_HEIGHT,
-            backgroundColor: colors.white,
-            borderRadius: radii.control,
-            overflow: 'hidden',
-          },
-          shadows.control,
-        ]}
+        style={{
+          height: TRACK_HEIGHT,
+          borderRadius: radii.control,
+          backgroundColor: skyAlpha(0.75),
+        }}
       >
-        {waveformUri ? (
-          <View pointerEvents="none" style={{ position: 'absolute', top: 6, bottom: 6, left: 0, right: 0 }}>
-            <Image
-              source={{ uri: `file://${waveformUri}` }}
-              style={{ flex: 1, width: undefined, height: undefined }}
-              resizeMode="stretch"
-            />
-          </View>
-        ) : (
-          <View
-            pointerEvents="none"
-            style={{
+        {/* Whole song, faded into the sky */}
+        <View pointerEvents="none" style={{ position: 'absolute', inset: 0, opacity: 0.35 }}>
+          {wave}
+        </View>
+
+        {/* Selection — a white card that owns its background, border and
+            corners, so no rounding depends on the parent clipping children
+            (Android only clips to the rectangle). */}
+        <View
+          pointerEvents="none"
+          style={[
+            {
               position: 'absolute',
               top: 0,
               bottom: 0,
-              left: 4,
-              right: 4,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 3,
-            }}
-          >
-            {bars.map((b, i) => (
-              <View
-                key={i}
-                style={{
-                  flex: 1,
-                  height: b * (TRACK_HEIGHT - 34),
-                  borderRadius: 3,
-                  backgroundColor: colors.ink,
-                }}
-              />
-            ))}
+              left: x1,
+              width: Math.max(0, x2 - x1),
+              backgroundColor: colors.white,
+              borderWidth: 2,
+              borderColor: colors.ink,
+              borderRadius: radii.control,
+            },
+            shadows.control,
+          ]}
+        >
+          <View style={{ flex: 1, borderRadius: radii.control - 2, overflow: 'hidden' }}>
+            {/* Track-sized clone shifted left so the slice lines up exactly
+                (the -2s compensate for the card border). */}
+            <View style={{ position: 'absolute', left: -x1 - 2, top: -2, width, height: TRACK_HEIGHT }}>
+              {wave}
+            </View>
           </View>
-        )}
-
-        {/* Fade everything outside the selection into the sky */}
-        <View
-          pointerEvents="none"
-          style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: x1, backgroundColor: skyAlpha(0.75) }}
-        />
-        <View
-          pointerEvents="none"
-          style={{ position: 'absolute', top: 0, bottom: 0, left: x2, right: 0, backgroundColor: skyAlpha(0.75) }}
-        />
-
-        {/* Selection frame */}
-        <View
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            left: x1,
-            width: Math.max(0, x2 - x1),
-            borderWidth: 2,
-            borderColor: colors.ink,
-            borderRadius: 10,
-          }}
-        />
+        </View>
 
         {/* Playhead */}
         {playheadSec !== null && pps > 0 && (
