@@ -6,7 +6,7 @@ import BigButton from '../components/BigButton';
 import Card from '../components/Card';
 import ScreenHeader from '../components/ScreenHeader';
 import { HeartIcon, StarIcon } from '../components/icons';
-import { openPatreon, openPlayStoreRating } from '../lib/links';
+import { openKofi, openPlayStoreRating } from '../lib/links';
 import { colors, fonts } from '../theme';
 import { RootStackParamList } from '../types/navigation';
 
@@ -53,13 +53,13 @@ export default function SupportScreen({ navigation }: Props) {
               Fuel the next feature
             </Text>
             <Text style={{ fontFamily: fonts.body, fontSize: 15, color: colors.smoke, lineHeight: 22 }}>
-              Patreon support funds the time to build what's next.
+              Ko-fi support funds the time to build what's next.
             </Text>
             <BigButton
-              label="Support on Patreon"
+              label="Support on Ko-fi"
               variant="ghost"
               icon={<HeartIcon size={18} color={colors.ink} />}
-              onPress={openPatreon}
+              onPress={openKofi}
               style={{ marginTop: 6 }}
             />
           </View>
