@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts.css"><link rel="stylesheet" href="style.css">
+<style>
+  .track { position: relative; height: 230px; border-radius: 35px; background: rgba(255,255,255,0.45); }
+  .bars { position: absolute; inset: 14px 9px; display: flex; align-items: center; gap: 6.6px; }
+  .bars i { flex: 1; border-radius: 6.6px; background: #3C464B; }
+  .sel {
+    position: absolute; top: 0; bottom: 0; left: 245px; width: 296px;
+    background: #FFFFFF; border: 4.4px solid #3C464B; border-radius: 35px;
+    box-shadow: 0 7px 18px rgba(60,70,75,0.12); overflow: hidden;
+  }
+  .grip {
+    position: absolute; top: 57px; bottom: 57px; width: 31px; border-radius: 16px;
+    background: #FFFFFF; box-shadow: 0 7px 18px rgba(60,70,75,0.2);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .grip i { display: block; width: 5.5px; height: 40px; border-radius: 3px; background: #3C464B; }
+  .times { display: flex; justify-content: space-between; align-items: center; margin-top: 26px; }
+  .tlabel { font-weight: 600; font-size: 29px; color: #595E5E; border-bottom: 2.2px dashed #9AB1C2; padding-bottom: 3px; }
+  .lenpill { background: #B2C8D4; border-radius: 999px; padding: 9px 26px; font-weight: 600; font-size: 29px; color: #3C464B; }
+</style>
+</head><body>
+
+  <div class="top">
+    <!-- hand-drawn wave squiggle -->
+    <div class="doodle" style="height:110px; margin-top:20px">
+      <svg viewBox="0 0 200 90" fill="none" stroke="#3C464B" stroke-width="5.5" stroke-linecap="round">
+        <path d="M8 45 C 20 45, 22 20, 32 20 C 44 20, 44 70, 56 70 C 68 70, 66 12, 80 12 C 94 12, 92 78, 106 78 C 120 78, 118 26, 130 26 C 142 26, 142 60, 152 60 C 162 60, 164 40, 174 40 C 182 40, 186 45, 192 45"/>
+      </svg>
+    </div>
+    <h1>Trim straight to the chorus</h1>
+    <svg class="spark" style="right:-30px; top:60px" width="46" height="46" viewBox="0 0 40 40" fill="none" stroke="#3C464B" stroke-width="4" stroke-linecap="round">
+      <path d="M20 4 C 21 12, 22 14, 20 20 C 19 26, 20 30, 20 36 M4 20 C 12 19, 14 18, 20 20 C 26 21, 30 20, 36 20"/>
+    </svg>
+  </div>
+
+  <div class="phone"><div class="screen">
+    <div class="nav">
+      <div class="backbtn">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#3C464B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 L15 19"/></svg>
+      </div>
+      <div class="meter"><i class="on"></i><i class="on"></i><i class="cur"></i></div>
+    </div>
+    <div>
+      <div class="mtitle">Choose the moment</div>
+      <div class="msub">Drag the edges to trim · drag the middle to move</div>
+    </div>
+
+    <div class="card" style="width:420px; align-self:center">
+      <svg viewBox="0 0 100 100" width="420" height="420" style="display:block">
+        <defs><linearGradient id="dusk3" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#F7E7CB"/><stop offset="1" stop-color="#EEC49E"/>
+        </linearGradient></defs>
+        <rect width="100" height="100" fill="url(#dusk3)"/>
+        <circle cx="50" cy="53" r="15" fill="#FBF1DC"/>
+        <rect y="63" width="100" height="37" fill="#AECBDD"/>
+        <ellipse cx="50" cy="67" rx="12" ry="1.6" fill="#F4E3C4" opacity=".8"/>
+        <path d="M28 24 q1.6 -1.8 3.2 -.1 q1.6 -1.7 3.2 0" stroke="#3C464B" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".65"/>
+      </svg>
+    </div>
+
+    <div>
+      <div class="track">
+        <div class="bars" id="waveFull" style="opacity:.32"></div>
+        <div class="sel">
+          <div class="bars" id="waveSel" style="left:-240px; width:748px; inset:9.6px auto 9.6px -240px"></div>
+        </div>
+        <div class="grip" style="left:229.5px"><i></i></div>
+        <div class="grip" style="left:525.5px"><i></i></div>
+      </div>
+      <div class="times">
+        <span class="tlabel">1:04</span>
+        <span class="lenpill">13.2s selected</span>
+        <span class="tlabel">1:17</span>
+      </div>
+    </div>
+
+    <div class="btn primary">Make my SongShot</div>
+  </div></div>
+
+<script>
+  // Same deterministic pseudo-waveform as WaveTrimmer.fallbackBars
+  function bars(seed, count) {
+    let h = 2166136261;
+    for (let i = 0; i < seed.length; i++) h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
+    const out = [];
+    for (let i = 0; i < count; i++) {
+      h = Math.imul(h ^ (h >>> 13), 1274126177);
+      const r = ((h >>> 0) % 1000) / 1000;
+      out.push(0.25 + 0.7 * Math.abs(Math.sin(i * 0.7)) * (0.4 + 0.6 * r));
+    }
+    return out;
+  }
+  const hs = bars('Golden Hour.m4a', 52);
+  for (const id of ['waveFull', 'waveSel']) {
+    const el = document.getElementById(id);
+    el.innerHTML = hs.map(b => `<i style="height:${Math.round(b * 172)}px"></i>`).join('');
+  }
+</script>
+</body></html>

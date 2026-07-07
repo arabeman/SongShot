@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts.css"><link rel="stylesheet" href="style.css">
+</head><body>
+
+  <div class="top">
+    <!-- hand-drawn eighth note -->
+    <div class="doodle">
+      <svg viewBox="0 0 120 120" fill="none" stroke="#3C464B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+        <ellipse cx="42" cy="92" rx="14" ry="10.5" transform="rotate(-14 42 92)"/>
+        <path d="M55 88 C 56 66, 55 48, 55 26 C 68 30, 82 34, 86 48 C 88 56, 84 62, 78 65"/>
+      </svg>
+    </div>
+    <h1>Pair it with the right song</h1>
+    <svg class="spark" style="left:-20px; top:250px" width="52" height="52" viewBox="0 0 40 40" fill="none" stroke="#3C464B" stroke-width="3.4" stroke-linecap="round">
+      <circle cx="13" cy="29" r="4.6"/><path d="M17.6 28 L18 12 C 23 13, 27 15, 28 19"/>
+    </svg>
+  </div>
+
+  <div class="phone"><div class="screen">
+    <div class="nav">
+      <div class="backbtn">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#3C464B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 L15 19"/></svg>
+      </div>
+      <div class="meter"><i class="on"></i><i class="cur"></i><i></i></div>
+    </div>
+    <div>
+      <div class="mtitle">Pick the song</div>
+      <div class="msub">Any audio file on your phone works.</div>
+    </div>
+
+    <!-- the chosen picture stays visible for context -->
+    <div class="card" style="width:280px; align-self:center">
+      <svg viewBox="0 0 100 100" width="280" height="280" style="display:block">
+        <defs><linearGradient id="dusk2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#F7E7CB"/><stop offset="1" stop-color="#EEC49E"/>
+        </linearGradient></defs>
+        <rect width="100" height="100" fill="url(#dusk2)"/>
+        <circle cx="50" cy="53" r="15" fill="#FBF1DC"/>
+        <rect y="63" width="100" height="37" fill="#AECBDD"/>
+        <ellipse cx="50" cy="67" rx="12" ry="1.6" fill="#F4E3C4" opacity=".8"/>
+        <path d="M28 24 q1.6 -1.8 3.2 -.1 q1.6 -1.7 3.2 0" stroke="#3C464B" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".65"/>
+      </svg>
+    </div>
+
+    <!-- the picked song row -->
+    <div class="card" style="padding:40px; display:flex; align-items:center; gap:31px">
+      <div style="width:101px;height:101px;border-radius:35px;background:#C9E3F5;display:flex;align-items:center;justify-content:center">
+        <div class="wavemark"><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-weight:600;font-size:35px">Golden Hour.m4a</div>
+        <div style="font-size:29px;color:#595E5E">3:42 long</div>
+      </div>
+    </div>
+
+    <div class="btn ghost">Swap song</div>
+    <div class="btn primary">Next: choose the moment</div>
+  </div></div>
+
+</body></html>

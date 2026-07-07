@@ -1,0 +1,120 @@
+/* SongShot Play Store frames — 1080x1920.
+   Palette and type come straight from src/theme.ts:
+   sky #C9E3F5 · mist #B2C8D4 · steel #9AB1C2 · smoke #595E5E · ink #3C464B */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { width: 1080px; height: 1920px; overflow: hidden; }
+
+body {
+  background: #C9E3F5;
+  color: #3C464B;
+  font-family: 'Nunito', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* ---------- canvas top: doodle + headline ---------- */
+
+.top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  padding-top: 116px;
+  position: relative;
+}
+
+.doodle { height: 148px; }
+.doodle svg { height: 100%; }
+
+h1 {
+  font-family: 'Bricolage', sans-serif;
+  font-weight: 600;
+  font-size: 97px;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  text-align: center;
+  max-width: 940px;
+}
+
+/* small ink accents floating on the sky */
+.spark { position: absolute; }
+
+/* ---------- the phone card ---------- */
+
+.phone {
+  flex: none;
+  margin-top: 68px;
+  width: 924px;
+  height: 1500px;
+  background: #FFFFFF;
+  border-radius: 84px;
+  padding: 26px 26px 0;
+  box-shadow: 0 42px 120px rgba(60, 70, 75, 0.30);
+}
+
+.screen {
+  height: 100%;
+  background: #C9E3F5;
+  border-radius: 60px 60px 0 0;
+  padding: 36px 53px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+}
+
+/* ---------- mock UI atoms (app px × 2.2) ---------- */
+
+.nav { display: flex; justify-content: space-between; align-items: center; height: 108px; }
+
+.backbtn {
+  width: 88px; height: 88px; border-radius: 999px; background: #FFFFFF;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 7px 18px rgba(60, 70, 75, 0.12);
+}
+
+.meter { display: flex; gap: 11px; align-items: center; }
+.meter i { display: block; width: 22px; height: 9px; border-radius: 5px; background: #B2C8D4; }
+.meter i.on  { background: #3C464B; }
+.meter i.cur { background: #3C464B; width: 48px; }
+
+.mtitle { font-family: 'Bricolage'; font-weight: 600; font-size: 59px; margin-top: 6px; }
+.msub   { font-size: 31px; color: #595E5E; margin-top: 12px; }
+
+.card {
+  background: #FFFFFF;
+  border-radius: 44px;
+  box-shadow: 0 13px 31px rgba(60, 70, 75, 0.14);
+  overflow: hidden;
+}
+
+.btn {
+  height: 112px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center; gap: 22px;
+  font-family: 'Nunito'; font-weight: 600; font-size: 35px;
+}
+.btn.primary { background: #3C464B; color: #C9E3F5; box-shadow: 0 7px 18px rgba(60, 70, 75, 0.12); }
+.btn.ghost   { background: #FFFFFF; color: #3C464B; border: 2px solid #B2C8D4; }
+
+.wavemark { display: flex; align-items: center; gap: 7px; height: 44px; }
+.wavemark i { display: block; width: 6px; border-radius: 3px; background: #3C464B; }
+.wavemark i:nth-child(1) { height: 38%; }
+.wavemark i:nth-child(2) { height: 72%; }
+.wavemark i:nth-child(3) { height: 100%; }
+.wavemark i:nth-child(4) { height: 55%; }
+.wavemark i:nth-child(5) { height: 82%; }
+
+/* ---------- brand + closing frames ---------- */
+
+.wordmark { font-family: 'Bricolage'; font-weight: 700; color: #3C464B; }
+
+.pill {
+  background: #FFFFFF;
+  border-radius: 999px;
+  padding: 34px 62px;
+  font-family: 'Nunito'; font-weight: 600; font-size: 36px; color: #3C464B;
+  box-shadow: 0 13px 31px rgba(60, 70, 75, 0.14);
+}
