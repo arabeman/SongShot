@@ -22,7 +22,7 @@ export default function PickImageScreen({ navigation }: Props) {
     if (result.didCancel) return;
     const uri = result.assets?.[0]?.uri;
     if (!uri) {
-      Alert.alert("Couldn't open that image", 'Try picking a different one.');
+      Alert.alert("Couldn't open that picture", 'Try picking a different one.');
       return;
     }
     setImageUri(uri);
@@ -31,7 +31,7 @@ export default function PickImageScreen({ navigation }: Props) {
   return (
     <View style={{ flex: 1, backgroundColor: colors.sky, paddingTop: insets.top }}>
       <ScreenHeader
-        title="Pick a photo"
+        title="Pick a picture"
         subtitle="Your video is built around one picture."
         onBack={() => navigation.goBack()}
         right={<StepMeter current={1} />}
@@ -57,14 +57,14 @@ export default function PickImageScreen({ navigation }: Props) {
           >
             <PhotoIcon size={46} color={colors.steel} />
             <Text style={{ fontFamily: fonts.body, fontSize: 14, color: colors.smoke, textAlign: 'center' }}>
-              The photo you choose shows up here.
+              The picture you choose shows up here.
             </Text>
           </View>
         )}
 
         <View style={{ gap: 12 }}>
           <BigButton
-            label={imageUri ? 'Swap photo' : 'Choose from gallery'}
+            label={imageUri ? 'Swap picture' : 'Choose from gallery'}
             variant={imageUri ? 'ghost' : 'primary'}
             icon={<PhotoIcon size={20} color={imageUri ? colors.ink : colors.sky} />}
             onPress={pick}

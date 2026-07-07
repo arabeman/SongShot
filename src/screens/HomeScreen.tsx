@@ -46,7 +46,7 @@ function EmptyFeed() {
           lineHeight: 31,
         }}
       >
-        Every photo has a soundtrack
+        Every shot has a soundtrack
       </Text>
       <Text
         style={{
