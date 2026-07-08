@@ -18,3 +18,9 @@ for src in "${!OUT[@]}"; do
     --screenshot="${OUT[$src]}.png" "file://$PWD/src/$src.html" 2>/dev/null
   echo "rendered ${OUT[$src]}.png"
 done
+
+# Feature-graphic cover — its own 1024x500 aspect (Play Store feature graphic).
+google-chrome --headless=new --disable-gpu --hide-scrollbars \
+  --window-size=1024,500 --force-device-scale-factor=1 \
+  --screenshot="00-cover.png" "file://$PWD/src/cover.html" 2>/dev/null
+echo "rendered 00-cover.png"
