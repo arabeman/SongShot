@@ -5,8 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BigButton from '../components/BigButton';
 import Card from '../components/Card';
 import ScreenHeader from '../components/ScreenHeader';
-import { HeartIcon, StarIcon } from '../components/icons';
-import { openKofi, openPlayStoreRating } from '../lib/links';
+import { StarIcon } from '../components/icons';
+import { openPlayStoreRating } from '../lib/links';
 import { colors, fonts } from '../theme';
 import { RootStackParamList } from '../types/navigation';
 
@@ -41,25 +41,6 @@ export default function SupportScreen({ navigation }: Props) {
               label="Rate on Google Play"
               icon={<StarIcon size={18} color={colors.sky} />}
               onPress={openPlayStoreRating}
-              style={{ marginTop: 6 }}
-            />
-          </View>
-        </Card>
-
-        <Card>
-          <View style={{ padding: 24, gap: 12 }}>
-            <HeartIcon size={26} filled />
-            <Text style={{ fontFamily: fonts.display, fontSize: 20, color: colors.ink }}>
-              Fuel the next feature
-            </Text>
-            <Text style={{ fontFamily: fonts.body, fontSize: 15, color: colors.smoke, lineHeight: 22 }}>
-              Ko-fi support funds the time to build what's next.
-            </Text>
-            <BigButton
-              label="Support on Ko-fi"
-              variant="ghost"
-              icon={<HeartIcon size={18} color={colors.ink} />}
-              onPress={openKofi}
               style={{ marginTop: 6 }}
             />
           </View>
